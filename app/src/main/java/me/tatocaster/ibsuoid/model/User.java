@@ -18,11 +18,15 @@ public class User {
     @SerializedName("id_number")
     private int id;
 
-    @ParcelConstructor
     public User(String name, String email, int id){
         this.name = name;
         this.email = email;
         this.id = id;
+    }
+
+    @ParcelConstructor
+    public User(){
+
     }
 
     public String getName() {
