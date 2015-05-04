@@ -1,4 +1,4 @@
-package me.tatocaster.ibsuoid;
+package me.tatocaster.ibsuoid.ui;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,6 +16,8 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import me.tatocaster.ibsuoid.Constants;
+import me.tatocaster.ibsuoid.R;
 import me.tatocaster.ibsuoid.model.User;
 
 /**

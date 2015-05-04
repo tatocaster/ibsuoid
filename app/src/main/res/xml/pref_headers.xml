@@ -2,13 +2,13 @@
 
     <!-- These settings headers are only used on tablets. -->
 
-    <header android:fragment="me.tatocaster.ibsuoid.SettingsActivity$GeneralPreferenceFragment"
+    <header android:fragment="me.tatocaster.ibsuoid.ui.SettingsActivity$GeneralPreferenceFragment"
         android:title="@string/pref_header_general" />
 
-    <header android:fragment="me.tatocaster.ibsuoid.SettingsActivity$NotificationPreferenceFragment"
+    <header android:fragment="me.tatocaster.ibsuoid.ui.SettingsActivity$NotificationPreferenceFragment"
         android:title="@string/pref_header_notifications" />
 
-    <header android:fragment="me.tatocaster.ibsuoid.SettingsActivity$DataSyncPreferenceFragment"
+    <header android:fragment="me.tatocaster.ibsuoid.ui.SettingsActivity$DataSyncPreferenceFragment"
         android:title="@string/pref_header_data_sync" />
 
 </preference-headers>
