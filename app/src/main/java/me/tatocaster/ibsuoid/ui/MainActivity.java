@@ -21,6 +21,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import me.tatocaster.ibsuoid.Constants;
 import me.tatocaster.ibsuoid.R;
 import me.tatocaster.ibsuoid.model.User;
+import me.tatocaster.ibsuoid.service.TranscriptFetchService;
 
 /**
  * tatocaster <kutaliatato@gmail.com>
@@ -50,6 +51,15 @@ public class MainActivity extends Activity {
         mUser.setName(prefs.getString("display_name", ""));
         materialDrawer = initDrawerWithListeners(mUser);
 
+    }
+
+    public void onStartService(View v) {
+        // Construct our Intent specifying the Service
+        Intent i = new Intent(this, TranscriptFetchService.class);
+        // Add extras to the bundle
+//        i.putExtra("foo", "bar");
+        // Start the service
+        startService(i);
     }
 
 

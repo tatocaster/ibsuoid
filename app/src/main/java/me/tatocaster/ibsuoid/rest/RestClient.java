@@ -17,7 +17,7 @@ public class RestClient {
 
     public RestClient() {
         Gson gson = new GsonBuilder()
-                .setDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss'")
+                .registerTypeAdapterFactory(new ItemTypeAdapterFactory())
                 .create();
 
         RestAdapter restAdapter = new RestAdapter.Builder()

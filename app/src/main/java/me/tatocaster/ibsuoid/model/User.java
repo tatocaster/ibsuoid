@@ -11,9 +11,7 @@ import org.parceler.ParcelConstructor;
 @Parcel
 public class User {
 
-    @SerializedName("name")
     private String name;
-    @SerializedName("email")
     private String email;
     @SerializedName("id_number")
     private int id;
