@@ -7,7 +7,7 @@ package me.tatocaster.ibsuoid;
 public class Constants {
     public static final int DRAWER_HOME_ID = 0;
     public static final int DRAWER_SETTINGS_ID = 2;
-    public static final String BASE_URL = "http://voyager.english-georgian.ge/~ibsu14eki";
+    public static final String BASE_URL = "https://my.ibsu.edu.ge/mobileapp/json-sis.php";
 
     public static final int SERVICE_STATUS_RUNNING = 0;
     public static final int SERVICE_STATUS_FINISHED = 1;

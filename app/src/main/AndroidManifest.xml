@@ -27,6 +27,13 @@
         <service
             android:name=".service.TranscriptFetchService"
             android:exported="false" />
+
+        <receiver android:name=".service.TranscriptBroadcastReceiver" android:enabled="true">
+            <intent-filter>
+                <action android:name="REFRESH_TRANSCRIPT_MARKS"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

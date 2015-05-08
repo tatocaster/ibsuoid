@@ -1,10 +1,16 @@
 package me.tatocaster.ibsuoid.ui;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -21,6 +27,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import me.tatocaster.ibsuoid.Constants;
 import me.tatocaster.ibsuoid.R;
 import me.tatocaster.ibsuoid.model.User;
+import me.tatocaster.ibsuoid.service.TranscriptBroadcastReceiver;
 import me.tatocaster.ibsuoid.service.TranscriptFetchService;
 
 /**
@@ -36,7 +43,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        scheduleAlarm();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         // display all preferences
 //        Map<String,?> keys = prefs.getAll();
@@ -51,15 +58,6 @@ public class MainActivity extends Activity {
         mUser.setName(prefs.getString("display_name", ""));
         materialDrawer = initDrawerWithListeners(mUser);
 
-    }
-
-    public void onStartService(View v) {
-        // Construct our Intent specifying the Service
-        Intent i = new Intent(this, TranscriptFetchService.class);
-        // Add extras to the bundle
-//        i.putExtra("foo", "bar");
-        // Start the service
-        startService(i);
     }
 
 
@@ -94,7 +92,7 @@ public class MainActivity extends Activity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
 
-                        switch (drawerItem.getIdentifier()){
+                        switch (drawerItem.getIdentifier()) {
                             case Constants.DRAWER_HOME_ID:
                                 onBackPressed();
                                 break;
@@ -119,6 +117,48 @@ public class MainActivity extends Activity {
         } else {
             super.onBackPressed();
         }
+    }
+
+
+    public void scheduleAlarm() {
+
+        if (this.isMyServiceRunning(TranscriptFetchService.class)) {
+            Log.d("MAIN ACTIVITY", "EXISTS");
+            cancelAlarm();
+        } else {
+
+            String alarm = Context.ALARM_SERVICE;
+            AlarmManager am = (AlarmManager) getSystemService(alarm);
+
+            Intent intent = new Intent("REFRESH_TRANSCRIPT_MARKS");
+            PendingIntent pi = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+            int type = AlarmManager.ELAPSED_REALTIME_WAKEUP;
+            // this will change with preference settings
+//            long interval = AlarmManager.INTERVAL_FIFTEEN_MINUTES;
+            long interval = 60000L;
+            long triggerTime = SystemClock.elapsedRealtime() + interval;
+            // set alarm
+            am.setInexactRepeating(type, triggerTime, interval, pi);
+        }
+
+    }
+
+    public void cancelAlarm() {
+        Intent intent = new Intent(getApplicationContext(), TranscriptBroadcastReceiver.class);
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        alarm.cancel(pIntent);
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

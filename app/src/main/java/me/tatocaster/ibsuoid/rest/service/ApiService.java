@@ -7,7 +7,7 @@ import retrofit.http.GET;
  */
 public interface ApiService {
 
-    @GET("/api/getUserSettings")
+    @GET("/getUserSettings")
 //    public void getUserSettings(Callback<User> callback);
     public void getUserSettings();
 
