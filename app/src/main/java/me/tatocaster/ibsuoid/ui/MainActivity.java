@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 
+import com.android.volley.Response;
 import com.mikepenz.iconics.typeface.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
@@ -24,9 +25,12 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import org.json.JSONObject;
+
 import me.tatocaster.ibsuoid.Constants;
 import me.tatocaster.ibsuoid.R;
 import me.tatocaster.ibsuoid.model.User;
+import me.tatocaster.ibsuoid.network.VolleyClient;
 import me.tatocaster.ibsuoid.service.TranscriptBroadcastReceiver;
 import me.tatocaster.ibsuoid.service.TranscriptFetchService;
 
@@ -35,6 +39,7 @@ import me.tatocaster.ibsuoid.service.TranscriptFetchService;
  */
 public class MainActivity extends Activity {
 
+    private static final String TAG = "MainActivity";
     private Drawer.Result materialDrawer;
     private User mUser;
     public static Activity thisActivity;
@@ -46,6 +51,7 @@ public class MainActivity extends Activity {
         scheduleAlarm();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         // display all preferences
+
 //        Map<String,?> keys = prefs.getAll();
 //        for(Map.Entry<String,?> entry : keys.entrySet()){
 //            Log.d("map values", entry.getKey() + ": " +
@@ -57,6 +63,15 @@ public class MainActivity extends Activity {
         // get display name from prefereces
         mUser.setName(prefs.getString("display_name", ""));
         materialDrawer = initDrawerWithListeners(mUser);
+
+        VolleyClient.getInstance(this).getTranscriptNewMarks(
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, null, "11200125", "rocker" // this must change from preferences
+        );
 
     }
 

@@ -1,26 +1,29 @@
 package me.tatocaster.ibsuoid.app;
 
 import android.app.Application;
+import android.content.Context;
 
-import me.tatocaster.ibsuoid.rest.RestClient;
+import me.tatocaster.ibsuoid.network.VolleyClient;
 
 /**
  * Created by tatocaster on 5/4/2015.
  */
 public class App extends Application
 {
-    private static RestClient restClient;
+
+    private static Context context;
+    private static VolleyClient v;
 
     @Override
     public void onCreate()
     {
         super.onCreate();
-
-        restClient = new RestClient();
+        App.context = getApplicationContext();
+        App.v = VolleyClient.getInstance(context);
     }
 
-    public static RestClient getRestClient()
+    public static VolleyClient getVolleyClient()
     {
-        return restClient;
+        return App.v;
     }
 }

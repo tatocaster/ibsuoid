@@ -1,19 +1,13 @@
 package me.tatocaster.ibsuoid.model;
-import com.google.gson.annotations.SerializedName;
-
-import org.parceler.Parcel;
-import org.parceler.ParcelConstructor;
 
 /**
  * Created by tatocaster on 2015-05-03.
  */
 
-@Parcel
 public class User {
 
     private String name;
     private String email;
-    @SerializedName("id_number")
     private int id;
 
     public User(String name, String email, int id){
@@ -22,7 +16,6 @@ public class User {
         this.id = id;
     }
 
-    @ParcelConstructor
     public User(){
 
     }

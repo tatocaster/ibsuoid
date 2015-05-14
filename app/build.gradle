@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
 }
 
 dependencies {
@@ -25,9 +29,7 @@ dependencies {
         transitive = true
     }
     compile 'com.android.support:appcompat-v7:22.1.1'
+    compile 'me.neavo:volley:2014.12.09'
     compile 'com.android.support:support-v4:22.1.1'
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
-    compile 'org.parceler:parceler:0.2.13'
-    compile 'com.google.code.gson:gson:2.3'
     compile 'com.afollestad:material-dialogs:0.7.3.1'
 }

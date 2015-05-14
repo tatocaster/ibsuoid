@@ -24,7 +24,7 @@ public class TranscriptFetchService extends Service {
     {
         if (!mRunning) {
             mRunning = true;
-            Log.d(TAG, "Service running");
+            Log.v(TAG,"Service is running");
         }
         return START_STICKY;
     }
