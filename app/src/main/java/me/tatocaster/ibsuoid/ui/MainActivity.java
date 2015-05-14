@@ -32,7 +32,6 @@ import me.tatocaster.ibsuoid.R;
 import me.tatocaster.ibsuoid.model.User;
 import me.tatocaster.ibsuoid.network.VolleyClient;
 import me.tatocaster.ibsuoid.service.TranscriptBroadcastReceiver;
-import me.tatocaster.ibsuoid.service.TranscriptFetchService;
 
 /**
  * tatocaster <kutaliatato@gmail.com>
@@ -137,10 +136,10 @@ public class MainActivity extends Activity {
 
     public void scheduleAlarm() {
 
-        if (this.isMyServiceRunning(TranscriptFetchService.class)) {
+        /*if (this.isMyServiceRunning(TranscriptFetchService.class)) {
             Log.d("MAIN ACTIVITY", "EXISTS");
             cancelAlarm();
-        } else {
+        } else {*/
 
             String alarm = Context.ALARM_SERVICE;
             AlarmManager am = (AlarmManager) getSystemService(alarm);
@@ -150,18 +149,17 @@ public class MainActivity extends Activity {
 
             int type = AlarmManager.ELAPSED_REALTIME_WAKEUP;
             // this will change with preference settings
-//            long interval = AlarmManager.INTERVAL_FIFTEEN_MINUTES;
-            long interval = 60000L;
-            long triggerTime = SystemClock.elapsedRealtime() + interval;
+            long interval = 30*1000L;
+            long firstTime  = SystemClock.elapsedRealtime();
             // set alarm
-            am.setInexactRepeating(type, triggerTime, interval, pi);
+            am.setInexactRepeating(type, firstTime, interval, pi);
         }
 
-    }
+//    }
 
     public void cancelAlarm() {
         Intent intent = new Intent(getApplicationContext(), TranscriptBroadcastReceiver.class);
-        final PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarm.cancel(pIntent);
     }
