@@ -49,12 +49,31 @@ public class VolleyClient {
         getRequestQueue().start();
     }
 
-    public void getTranscriptNewMarks(final Response.Listener<JSONObject> response, final Response.ErrorListener error, String user, String password) {
+    public void getTranscript(final Response.Listener<JSONObject> response, final Response.ErrorListener error, String user, String password) {
         String transcriptFullUrl = Constants.BASE_URL + transcriptUrl;
 
         JSONObject jsonBody = null;
         try {
             jsonBody = new JSONObject("{\"sis_request\":{\"get\":{\"transcript\": {\"user\":\"" + user + "\",\"pwdh\":\"" + password + "\"}}}}");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, transcriptFullUrl, jsonBody, response, error) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Content-Type", "application/json");
+                return params;
+            }
+        };
+        execute(jsonObjectRequest);
+    }
+
+    public void checkNewMarks(final Response.Listener<JSONObject> response, final Response.ErrorListener error, String user, String password) {
+        String transcriptFullUrl = Constants.BASE_URL + transcriptUrl;
+        JSONObject jsonBody = null;
+        try {
+            jsonBody = new JSONObject("{\"sis_request\":{\"get\":{\"new_marks\": {\"user\":\"" + user + "\",\"pwdh\":\"" + password + "\"}}}}");
         } catch (JSONException e) {
             e.printStackTrace();
         }
