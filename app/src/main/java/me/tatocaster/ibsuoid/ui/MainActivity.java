@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.android.volley.Response;
 import com.mikepenz.iconics.typeface.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
@@ -54,7 +56,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        scheduleAlarm();
+
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // display all preferences
@@ -69,10 +71,11 @@ public class MainActivity extends Activity {
         mUser.setName(prefs.getString("display_name", ""));
         materialDrawer = initDrawerWithListeners(mUser);
         if (prefs.getString("password", "").isEmpty()) {
-            showDialog();
+            showLoginDialog();
         } else {
             fetchTranscript();
         }
+        scheduleAlarm();
     }
 
 
@@ -103,6 +106,7 @@ public class MainActivity extends Activity {
                         new PrimaryDrawerItem().withName(R.string.drawer_item_home).withIcon(FontAwesome.Icon.faw_home).withIdentifier(Constants.DRAWER_HOME_ID),
                         new DividerDrawerItem(),
                         new SecondaryDrawerItem().withName(R.string.drawer_item_settings).withIcon(FontAwesome.Icon.faw_cog).withIdentifier(Constants.DRAWER_SETTINGS_ID),
+                        new SecondaryDrawerItem().withName(R.string.drawer_item_about).withIcon(FontAwesome.Icon.faw_android).withIdentifier(Constants.DRAWER_ABOUT_ID),
                         new SecondaryDrawerItem().withName(R.string.drawer_item_logout).withIcon(FontAwesome.Icon.faw_user).withIdentifier(Constants.DRAWER_LOGOUT_ID)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -120,6 +124,10 @@ public class MainActivity extends Activity {
                             case Constants.DRAWER_LOGOUT_ID:
                                 SharedPreferences.Editor editor = prefs.edit();
                                 editor.remove("password").remove("display_name").apply();
+                                cancelAlarm();
+                                break;
+                            case Constants.DRAWER_ABOUT_ID:
+                                showAboutDialog();
                                 break;
                         }
 
@@ -141,7 +149,7 @@ public class MainActivity extends Activity {
         );
     }
 
-    private void showDialog() {
+    private void showLoginDialog() {
 
         new MaterialDialog.Builder(this)
                 .title("Login Credentials")
@@ -185,6 +193,16 @@ public class MainActivity extends Activity {
                         }
                     }
                 })
+                .show();
+    }
+
+    private void showAboutDialog() {
+        new MaterialDialog.Builder(this)
+                .title(R.string.drawer_item_about)
+                .positiveText("Dismiss")
+                .content(Html.fromHtml(getString(R.string.about_body)))
+                .contentLineSpacing(1.6f)
+                .theme(Theme.DARK)
                 .show();
     }
 
