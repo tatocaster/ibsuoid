@@ -48,50 +48,42 @@ public class MainActivity extends Activity {
     private User mUser;
     public static Activity thisActivity;
     private Toast mToast;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         scheduleAlarm();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         // display all preferences
-
-//        Map<String,?> keys = prefs.getAll();
-//        for(Map.Entry<String,?> entry : keys.entrySet()){
-//            Log.d("map values", entry.getKey() + ": " +
-//                    entry.getValue().toString());
-//        }
-
+       /* Map<String, ?> keys = prefs.getAll();
+        for (Map.Entry<String, ?> entry : keys.entrySet()) {
+            Log.d(TAG, entry.getKey() + ": " + entry.getValue().toString());
+        }*/
 
         mUser = new User();
         mUser.setEmail("kutaliatato@gmail.com");
         // get display name from prefereces
         mUser.setName(prefs.getString("display_name", ""));
         materialDrawer = initDrawerWithListeners(mUser);
-
-        showDialog();
-
-        VolleyClient.getInstance(this).getTranscript(
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
-                    }
-                }, null, "11200125", "rocker" // this must change from preferences
-        );
-
+        if (prefs.getString("password", "").isEmpty()) {
+            showDialog();
+        } else {
+            fetchTranscript();
+        }
     }
 
 
     private Drawer.Result initDrawerWithListeners(User user) {
 
-        ProfileDrawerItem profileDraweritem = new ProfileDrawerItem().withName(user.getName()).withEmail(user.getEmail()).withIcon(getResources().getDrawable(R.color.md_black_1000));
+        ProfileDrawerItem profileDraweritem = new ProfileDrawerItem().withName(user.getName()).withEmail(user.getEmail()).withIcon(getResources().getDrawable(R.drawable.profile));
 
         // creating account header
         AccountHeader.Result headerResult = new AccountHeader()
                 .withActivity(this)
-                .withHeaderBackground(R.color.md_red_100)
+                .withHeaderBackground(R.drawable.cover)
                 .addProfiles(
                         profileDraweritem
                 )
@@ -101,6 +93,7 @@ public class MainActivity extends Activity {
                         return false;
                     }
                 })
+                .withCompactStyle(true)
                 .build();
 
         final Drawer.Result result = new Drawer()
@@ -124,6 +117,10 @@ public class MainActivity extends Activity {
                                 Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
                                 startActivity(intent);
                                 break;
+                            case Constants.DRAWER_LOGOUT_ID:
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.remove("password").remove("display_name").apply();
+                                break;
                         }
 
                     }
@@ -133,6 +130,16 @@ public class MainActivity extends Activity {
         return result;
     }
 
+    public void fetchTranscript() {
+        VolleyClient.getInstance(this).getTranscript(
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                    }
+                }, null, "11200125", prefs.getString("password", "") // this must change from preferences
+        );
+    }
 
     private void showDialog() {
 
@@ -148,7 +155,12 @@ public class MainActivity extends Activity {
                 .callback(new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
-                        showToast(dialog.getInputEditText().getText().toString());
+                        if (dialog.getInputEditText().getText() != null) {
+                            String password = dialog.getInputEditText().getText().toString();
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString("password", password).apply();
+                            fetchTranscript();
+                        }
                     }
 
                     @Override

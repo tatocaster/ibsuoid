@@ -2,7 +2,9 @@ package me.tatocaster.ibsuoid.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.android.volley.Response;
@@ -29,12 +31,13 @@ public class TranscriptFetchService extends Service {
         if (!mRunning) {
             mRunning = true;
         }
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         VolleyClient.getInstance(this).checkNewMarks(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.d(TAG, response.toString());
             }
-        }, null, "11200125", "rocker");
+        }, null, "11200125", prefs.getString("password",""));
         return START_NOT_STICKY;
     }
 
