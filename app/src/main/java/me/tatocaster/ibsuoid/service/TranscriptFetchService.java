@@ -43,21 +43,25 @@ public class TranscriptFetchService extends Service {
             @Override
             public void onResponse(JSONObject response) {
                 Log.d(TAG, response.toString());
+                showNotification();
             }
         }, null, "11200125", prefs.getString("password", ""));
+        return START_NOT_STICKY;
+    }
 
+
+    private void showNotification() {
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle(R.string.service_notification_label + "")
-                .setContentText(R.string.service_notification_label + "")
+                .setContentTitle(this.getResources().getString(R.string.service_notification_label))
+                .setContentText(this.getResources().getString(R.string.service_notification_label))
                 .setGroup("1")
 //                .setOngoing(true)
-                .setSmallIcon(R.drawable.avatar)
+                .setAutoCancel(true)
+                .setSmallIcon(R.mipmap.ic_stat_social_plus_one)
                 .setContentIntent(resultPendingIntent);
         mNotificationManager.notify(10, builder.build());
-
-        return START_NOT_STICKY;
     }
 
     @Override
