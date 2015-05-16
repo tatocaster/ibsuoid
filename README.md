@@ -1,5 +1,7 @@
 # ibsuoid
-IBSU android project
+IBSU android course project to view transcript and get new information from different services
 
-<img src="https://raw.github.com/tatocaster/ibsuoid/master/screenshot.png" alt="Screenshot" style="width:350px; height:622px;">
-<img src="https://raw.github.com/tatocaster/ibsuoid/master/about.png" alt="About" style="width:350px; height:622px;">
+![screenshot](https://raw.github.com/tatocaster/ibsuoid/master/screenshot.jpg)
+
+# Issues
+see issues page
