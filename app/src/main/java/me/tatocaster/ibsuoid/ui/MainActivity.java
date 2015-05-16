@@ -233,7 +233,7 @@ public class MainActivity extends Activity {
 
             int type = AlarmManager.ELAPSED_REALTIME_WAKEUP;
             // this will change with preference settings
-            long interval = 30 * 1000L;
+            long interval = 60 * 1000L;
             long firstTime = SystemClock.elapsedRealtime();
             // set alarm
             am.setInexactRepeating(type, firstTime, interval, pi);

@@ -3,6 +3,7 @@ package me.tatocaster.ibsuoid.service;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
@@ -46,12 +47,13 @@ public class TranscriptFetchService extends Service {
         }, null, "11200125", prefs.getString("password", ""));
 
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle(R.string.service_notification_label + "")
                 .setContentText(R.string.service_notification_label + "")
                 .setGroup("1")
-                .setOngoing(true)
-//                .setSmallIcon(R.drawable.marker)
+//                .setOngoing(true)
+                .setSmallIcon(R.drawable.avatar)
                 .setContentIntent(resultPendingIntent);
         mNotificationManager.notify(10, builder.build());
 
