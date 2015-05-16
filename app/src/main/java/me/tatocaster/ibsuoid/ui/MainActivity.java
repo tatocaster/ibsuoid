@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +34,7 @@ import org.json.JSONObject;
 
 import me.tatocaster.ibsuoid.Constants;
 import me.tatocaster.ibsuoid.R;
+import me.tatocaster.ibsuoid.Utilities;
 import me.tatocaster.ibsuoid.model.User;
 import me.tatocaster.ibsuoid.network.VolleyClient;
 import me.tatocaster.ibsuoid.service.TranscriptBroadcastReceiver;
@@ -55,9 +57,23 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        // set ativity context
         thisActivity = MainActivity.this;
-
+        Log.d(TAG, String.valueOf(Utilities.checkNetworkAvailability(thisActivity)));
+        if (!Utilities.checkNetworkAvailability(thisActivity)) {
+            DialogGenerator.noNetwork(thisActivity).callback(new MaterialDialog.ButtonCallback() {
+                @Override
+                public void onPositive(MaterialDialog dialog) {
+                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                }
+            }).dismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    thisActivity.finish();
+                }
+            })
+            .show();
+        }
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // display all preferences
