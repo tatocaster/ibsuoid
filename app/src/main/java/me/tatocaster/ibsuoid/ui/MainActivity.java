@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +18,6 @@ import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.Theme;
 import com.android.volley.Response;
 import com.mikepenz.iconics.typeface.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
@@ -39,6 +37,7 @@ import me.tatocaster.ibsuoid.model.User;
 import me.tatocaster.ibsuoid.network.VolleyClient;
 import me.tatocaster.ibsuoid.service.TranscriptBroadcastReceiver;
 import me.tatocaster.ibsuoid.service.TranscriptFetchService;
+import me.tatocaster.ibsuoid.ui.dialog.DialogGenerator;
 
 /**
  * tatocaster <kutaliatato@gmail.com>
@@ -56,6 +55,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        thisActivity = MainActivity.this;
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -127,7 +128,7 @@ public class MainActivity extends Activity {
                                 cancelAlarm();
                                 break;
                             case Constants.DRAWER_ABOUT_ID:
-                                showAboutDialog();
+                                DialogGenerator.showAboutDialog(thisActivity);
                                 break;
                         }
 
@@ -174,14 +175,14 @@ public class MainActivity extends Activity {
                     @Override
                     public void onNegative(MaterialDialog dialog) {
 //                        dialog.dismiss();
-                        MainActivity.this.finish();
+                        thisActivity.finish();
                     }
                 })
 
                 .dismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-//                        MainActivity.this.finish();
+//                        thisActivity.finish();
                     }
                 })
                 .input("Password", "", false, new MaterialDialog.InputCallback() {
@@ -195,17 +196,6 @@ public class MainActivity extends Activity {
                 })
                 .show();
     }
-
-    private void showAboutDialog() {
-        new MaterialDialog.Builder(this)
-                .title(R.string.drawer_item_about)
-                .positiveText("Dismiss")
-                .content(Html.fromHtml(getString(R.string.about_body)))
-                .contentLineSpacing(1.6f)
-                .theme(Theme.DARK)
-                .show();
-    }
-
 
     @Override
     public void onBackPressed() {
@@ -224,7 +214,6 @@ public class MainActivity extends Activity {
             Log.d("MAIN ACTIVITY", "EXISTS");
             cancelAlarm();
         } else {
-
             String alarm = Context.ALARM_SERVICE;
             AlarmManager am = (AlarmManager) getSystemService(alarm);
 

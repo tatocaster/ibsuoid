@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.android.volley.Response;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.tatocaster.ibsuoid.R;
@@ -42,8 +43,20 @@ public class TranscriptFetchService extends Service {
         VolleyClient.getInstance(this).checkNewMarks(new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.d(TAG, response.toString());
-                showNotification();
+
+                try {
+                    Log.d(TAG, response.toString());
+                    showNotification(); // just to show that service is running, it must be within the if statement
+                    String sisResponse = response.getString("sis_response");
+                    JSONObject sisResponseObject = new JSONObject(sisResponse);
+                    if (!Boolean.valueOf(sisResponseObject.getString("new_marks"))) {
+                        return;
+                    }
+//                    showNotification();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
         }, null, "11200125", prefs.getString("password", ""));
         return START_NOT_STICKY;
