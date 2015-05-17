@@ -56,15 +56,15 @@ public class Utilities {
      *
      * @param context
      */
-    public static void showNotification(Context context) {
+    public static void showNotification(Context context,String title, String body) {
         NotificationManager mNotificationManager;
         // define sound URI, the sound to be played when there's a notification
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
         mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                .setContentTitle(context.getResources().getString(R.string.service_notification_label))
-                .setContentText(context.getResources().getString(R.string.service_notification_label))
+                .setContentTitle(title)
+                .setContentText(body)
                 .setGroup("1")
 //                .setOngoing(true)
                 .setAutoCancel(true)

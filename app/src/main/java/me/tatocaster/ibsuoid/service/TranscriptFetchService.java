@@ -12,6 +12,7 @@ import com.android.volley.Response;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import me.tatocaster.ibsuoid.R;
 import me.tatocaster.ibsuoid.Utilities;
 import me.tatocaster.ibsuoid.network.VolleyClient;
 
@@ -40,10 +41,16 @@ public class TranscriptFetchService extends Service {
 
                 try {
                     Log.d(TAG, response.toString());
-                    String sisResponse = response.getString("sis_response");
-                    JSONObject sisResponseObject = new JSONObject(sisResponse);
-                    if (Boolean.valueOf(sisResponseObject.getString("new_marks"))) {
-                        Utilities.showNotification(TranscriptFetchService.this);
+                    JSONObject sisResponseObject = new JSONObject(response.getString("sis_response"));
+
+                    // if fucking error occured. ugly json :(
+                    if (sisResponseObject.has("error")) {
+                        JSONObject error = new JSONObject(sisResponseObject.getString("error"));
+                        Utilities.showNotification(TranscriptFetchService.this, "Error", error.getString("new_marks"));
+                    } else if(sisResponseObject.has("new_marks") && Boolean.valueOf(sisResponseObject.getString("new_marks")) ){
+                        Utilities.showNotification(TranscriptFetchService.this,
+                                getResources().getString(R.string.service_notification_label),
+                                getResources().getString(R.string.service_notification_label));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
