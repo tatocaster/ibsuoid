@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         // set ativity context
         thisActivity = MainActivity.this;
-        Log.d(TAG, String.valueOf(Utilities.checkNetworkAvailability(thisActivity)));
+
         if (!Utilities.checkNetworkAvailability(thisActivity)) {
             DialogGenerator.noNetwork(thisActivity).callback(new MaterialDialog.ButtonCallback() {
                 @Override
