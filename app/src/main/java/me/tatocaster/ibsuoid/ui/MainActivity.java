@@ -12,13 +12,21 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Toast;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.ThemeSingleton;
+import com.afollestad.materialdialogs.internal.MDTintHelper;
 import com.android.volley.Response;
 import com.mikepenz.iconics.typeface.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
@@ -50,7 +58,7 @@ public class MainActivity extends Activity {
     private Drawer.Result materialDrawer;
     private User mUser;
     public static Activity thisActivity;
-    private Toast mToast;
+
     private SharedPreferences prefs;
 
     @Override
@@ -71,8 +79,7 @@ public class MainActivity extends Activity {
                 public void onDismiss(DialogInterface dialog) {
                     thisActivity.finish();
                 }
-            })
-            .show();
+            }).show();
         }
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -82,23 +89,23 @@ public class MainActivity extends Activity {
             Log.d(TAG, entry.getKey() + ": " + entry.getValue().toString());
         }*/
 
-        mUser = new User();
-        mUser.setEmail("kutaliatato@gmail.com");
-        // get display name from prefereces
-        mUser.setName(prefs.getString("display_name", ""));
-        materialDrawer = initDrawerWithListeners(mUser);
-        if (prefs.getString("password", "").isEmpty()) {
+        if (prefs.getString("password", "").isEmpty() || prefs.getString("username", "").isEmpty()) {
             showLoginDialog();
         } else {
             fetchTranscript();
         }
-        scheduleAlarm();
+
+        mUser = new User();
+        // get display name from prefereces
+        mUser.setName(prefs.getString("username", ""));
+        materialDrawer = initDrawerWithListeners(mUser);
+
     }
 
 
     private Drawer.Result initDrawerWithListeners(User user) {
 
-        ProfileDrawerItem profileDraweritem = new ProfileDrawerItem().withName(user.getName()).withEmail(user.getEmail()).withIcon(getResources().getDrawable(R.drawable.profile));
+        ProfileDrawerItem profileDraweritem = new ProfileDrawerItem().withEmail(user.getName()).withIcon(getResources().getDrawable(R.drawable.profile));
 
         // creating account header
         AccountHeader.Result headerResult = new AccountHeader()
@@ -140,7 +147,7 @@ public class MainActivity extends Activity {
                                 break;
                             case Constants.DRAWER_LOGOUT_ID:
                                 SharedPreferences.Editor editor = prefs.edit();
-                                editor.remove("password").remove("display_name").apply();
+                                editor.remove("password").remove("display_name").remove("username").apply();
                                 cancelAlarm();
                                 break;
                             case Constants.DRAWER_ABOUT_ID:
@@ -160,57 +167,104 @@ public class MainActivity extends Activity {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        // https://gist.github.com/tatocaster/a5d0e7066d29aa3410cc
                         Log.d(TAG, response.toString());
                     }
-                }, null, "11200125", prefs.getString("password", "") // this must change from preferences
+                }, null, prefs.getString("username", ""), prefs.getString("password", "") // this must change from preferences
         );
     }
 
+    private View positiveAction;
+    private EditText passwordInput;
+    private EditText usernameInput;
+
     private void showLoginDialog() {
-
-        new MaterialDialog.Builder(this)
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
                 .title("Login Credentials")
-                .content("Please Enter Your Password")
+                .customView(R.layout.login_dialog_view, true)
                 .positiveText("OK")
-                .negativeText("Cancel")
-                .inputType(InputType.TYPE_CLASS_TEXT |
-                        InputType.TYPE_TEXT_VARIATION_PASSWORD |
-                        InputType.TYPE_TEXT_FLAG_CAP_WORDS)
-                .inputMaxLength(16)
-                .callback(new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        if (dialog.getInputEditText().getText() != null) {
-                            String password = dialog.getInputEditText().getText().toString();
-                            SharedPreferences.Editor editor = prefs.edit();
-                            editor.putString("password", password).apply();
-                            fetchTranscript();
-                        }
-                    }
-
-                    @Override
-                    public void onNegative(MaterialDialog dialog) {
-//                        dialog.dismiss();
-                        thisActivity.finish();
-                    }
-                })
-
+                .negativeText(android.R.string.cancel)
                 .dismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
 //                        thisActivity.finish();
                     }
                 })
-                .input("Password", "", false, new MaterialDialog.InputCallback() {
+                .callback(new MaterialDialog.ButtonCallback() {
                     @Override
-                    public void onInput(MaterialDialog dialog, CharSequence input) {
-                        String inputString = input.toString();
-                        if (inputString.length() == 0 || inputString.isEmpty()) {
-                            showToast("Please Fill The Input");
+                    public void onPositive(MaterialDialog dialog) {
+                        if (passwordInput != null && usernameInput != null) {
+                            String password = passwordInput.getText().toString();
+                            String username = usernameInput.getText().toString();
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString("password", password).putString("username", username).apply();
+                            fetchTranscript();
+                            scheduleAlarm();
                         }
                     }
-                })
-                .show();
+
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        thisActivity.finish();
+                    }
+                }).build();
+
+        positiveAction = dialog.getActionButton(DialogAction.POSITIVE);
+
+        passwordInput = (EditText) dialog.getCustomView().findViewById(R.id.password);
+        passwordInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                positiveAction.setEnabled(s.toString().trim().length() > 0);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        usernameInput = (EditText) dialog.getCustomView().findViewById(R.id.username);
+        usernameInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                positiveAction.setEnabled(s.toString().trim().length() > 0);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+
+        });
+
+        // Toggling the show password CheckBox will mask or unmask the password input EditText
+        CheckBox checkbox = (CheckBox) dialog.getCustomView().findViewById(R.id.showPassword);
+        checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                passwordInput.setInputType(!isChecked ? InputType.TYPE_TEXT_VARIATION_PASSWORD : InputType.TYPE_CLASS_TEXT);
+                passwordInput.setTransformationMethod(!isChecked ? PasswordTransformationMethod.getInstance() : null);
+            }
+        });
+        int widgetColor = ThemeSingleton.get().widgetColor;
+        MDTintHelper.setTint(checkbox,
+                widgetColor == 0 ? getResources().getColor(R.color.material_teal_500) : widgetColor);
+        MDTintHelper.setTint(passwordInput,
+                widgetColor == 0 ? getResources().getColor(R.color.material_teal_500) : widgetColor);
+        MDTintHelper.setTint(usernameInput,
+                widgetColor == 0 ? getResources().getColor(R.color.material_teal_500) : widgetColor);
+
+        dialog.show();
+        positiveAction.setEnabled(false); // disabled by default
     }
 
     @Override
@@ -251,6 +305,8 @@ public class MainActivity extends Activity {
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarm.cancel(pIntent);
+        stopService(new Intent(MainActivity.this, TranscriptFetchService.class));
+
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -261,17 +317,6 @@ public class MainActivity extends Activity {
             }
         }
         return false;
-    }
-
-
-    // helper function
-    private void showToast(String message) {
-        if (mToast != null) {
-            mToast.cancel();
-            mToast = null;
-        }
-        mToast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
-        mToast.show();
     }
 
 

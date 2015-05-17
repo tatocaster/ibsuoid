@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.widget.Toast;
 
 import me.tatocaster.ibsuoid.ui.MainActivity;
 
@@ -19,6 +20,7 @@ import me.tatocaster.ibsuoid.ui.MainActivity;
 public class Utilities {
 
     private static boolean isWIFI;
+    private static Toast mToast;
 
     public Utilities() {
     }
@@ -74,5 +76,18 @@ public class Utilities {
         mNotificationManager.notify(10, builder.build());
     }
 
+    /**
+     *
+     * @param message
+     */
+    // helper function
+    public static void showToast(Context context, String message) {
+        if (Utilities.mToast != null) {
+            Utilities.mToast.cancel();
+            Utilities.mToast = null;
+        }
+        Utilities.mToast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        Utilities.mToast.show();
+    }
 
 }

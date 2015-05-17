@@ -9,6 +9,7 @@
     <string name="drawer_item_logout">Logout</string>
     <string name="service_notification_label">New Marks Available</string>
     <string name="alert_no_network_title">You have not any active network connection</string>
+    <string name="showPassword">Show Password</string>
 
 
     <string name="about_body"><![CDATA[

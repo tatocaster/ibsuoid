@@ -3,6 +3,7 @@ package me.tatocaster.ibsuoid.service;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -27,6 +28,13 @@ public class TranscriptFetchService extends Service {
     public void onCreate() {
         super.onCreate();
         mRunning = false;
+    }
+
+    public void onDestroy(){
+        super.onDestroy();
+        mRunning = false;
+        Handler h = new Handler();
+        h.removeCallbacksAndMessages(null);
     }
 
     @Override
@@ -57,7 +65,7 @@ public class TranscriptFetchService extends Service {
                 }
 
             }
-        }, null, "11200125", prefs.getString("password", ""));
+        }, null, prefs.getString("username", ""), prefs.getString("password", ""));
         return START_NOT_STICKY;
     }
 
