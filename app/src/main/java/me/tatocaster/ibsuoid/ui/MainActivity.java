@@ -149,6 +149,15 @@ public class MainActivity extends Activity {
                                 SharedPreferences.Editor editor = prefs.edit();
                                 editor.remove("password").remove("display_name").remove("username").apply();
                                 cancelAlarm();
+                                /*materialDrawer.removeItem(Constants.DRAWER_LOGOUT_ID);
+                                materialDrawer.addItem(
+                                        new PrimaryDrawerItem().withName(R.string.drawer_item_login).
+                                                withIcon(FontAwesome.Icon.faw_user).
+                                                withIdentifier(Constants.DRAWER_LOGIN_ID),
+                                        Constants.DRAWER_LOGIN_ID);*/
+                                break;
+                            case Constants.DRAWER_LOGIN_ID:
+                                showLoginDialog();
                                 break;
                             case Constants.DRAWER_ABOUT_ID:
                                 DialogGenerator.showAboutDialog(thisActivity);
