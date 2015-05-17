@@ -69,7 +69,7 @@ public class Utilities {
 //                .setOngoing(true)
                 .setAutoCancel(true)
                 .setSound(soundUri)
-                .setSmallIcon(R.mipmap.ic_stat_social_plus_one)
+                .setSmallIcon(R.mipmap.service_notification)
                 .setContentIntent(resultPendingIntent);
         mNotificationManager.notify(10, builder.build());
     }
