@@ -52,7 +52,7 @@ import me.tatocaster.ibsuoid.ui.dialog.DialogGenerator;
 /**
  * tatocaster <kutaliatato@gmail.com>
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements Drawer.OnDrawerItemClickListener{
 
     private static final String TAG = "MainActivity";
     private Drawer.Result materialDrawer;
@@ -133,42 +133,42 @@ public class MainActivity extends Activity {
                         new SecondaryDrawerItem().withName(R.string.drawer_item_about).withIcon(FontAwesome.Icon.faw_android).withIdentifier(Constants.DRAWER_ABOUT_ID),
                         new SecondaryDrawerItem().withName(R.string.drawer_item_logout).withIcon(FontAwesome.Icon.faw_user).withIdentifier(Constants.DRAWER_LOGOUT_ID)
                 )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
-
-                        switch (drawerItem.getIdentifier()) {
-                            case Constants.DRAWER_HOME_ID:
-                                onBackPressed();
-                                break;
-                            case Constants.DRAWER_SETTINGS_ID:
-                                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-                                startActivity(intent);
-                                break;
-                            case Constants.DRAWER_LOGOUT_ID:
-                                SharedPreferences.Editor editor = prefs.edit();
-                                editor.remove("password").remove("display_name").remove("username").apply();
-                                cancelAlarm();
-                                /*materialDrawer.removeItem(Constants.DRAWER_LOGOUT_ID);
-                                materialDrawer.addItem(
-                                        new PrimaryDrawerItem().withName(R.string.drawer_item_login).
-                                                withIcon(FontAwesome.Icon.faw_user).
-                                                withIdentifier(Constants.DRAWER_LOGIN_ID),
-                                        Constants.DRAWER_LOGIN_ID);*/
-                                break;
-                            case Constants.DRAWER_LOGIN_ID:
-                                showLoginDialog();
-                                break;
-                            case Constants.DRAWER_ABOUT_ID:
-                                DialogGenerator.showAboutDialog(thisActivity);
-                                break;
-                        }
-
-                    }
-                })
+                .withOnDrawerItemClickListener(this)
                 .build();
 
         return result;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
+
+        switch (drawerItem.getIdentifier()) {
+            case Constants.DRAWER_HOME_ID:
+                onBackPressed();
+                break;
+            case Constants.DRAWER_SETTINGS_ID:
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
+                break;
+            case Constants.DRAWER_LOGOUT_ID:
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.remove("password").remove("display_name").remove("username").apply();
+                cancelAlarm();
+                materialDrawer.removeItem(position);
+                materialDrawer.addItem(
+                        new PrimaryDrawerItem().withName(R.string.drawer_item_login).
+                                withIcon(FontAwesome.Icon.faw_user).
+                                withIdentifier(Constants.DRAWER_LOGIN_ID),
+                        Constants.DRAWER_LOGIN_ID);
+                break;
+            case Constants.DRAWER_LOGIN_ID:
+                showLoginDialog();
+                break;
+            case Constants.DRAWER_ABOUT_ID:
+                DialogGenerator.showAboutDialog(thisActivity);
+                break;
+        }
+
     }
 
     public void fetchTranscript() {
