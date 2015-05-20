@@ -5,4 +5,4 @@ IBSU android course project to view transcript and get new information from diff
 ![screenshot](https://raw.github.com/tatocaster/ibsuoid/master/screenshot.jpg)
 
 # Issues
-see issues page
+see [issues page](https://github.com/tatocaster/ibsuoid/issues "issues page")
