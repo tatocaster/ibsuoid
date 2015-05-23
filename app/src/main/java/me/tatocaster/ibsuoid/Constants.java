@@ -11,5 +11,4 @@ public class Constants {
     public static final int DRAWER_ABOUT_ID = 3;
     public static final int DRAWER_LOGIN_ID = 4;
     public static final String BASE_URL = "https://my.ibsu.edu.ge";
-
 }
