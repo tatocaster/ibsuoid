@@ -22,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ListView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -38,11 +39,18 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import me.tatocaster.ibsuoid.Constants;
 import me.tatocaster.ibsuoid.R;
 import me.tatocaster.ibsuoid.Utilities;
+import me.tatocaster.ibsuoid.adapter.TranscriptListAdapter;
+import me.tatocaster.ibsuoid.model.Transcript;
 import me.tatocaster.ibsuoid.model.User;
 import me.tatocaster.ibsuoid.network.VolleyClient;
 import me.tatocaster.ibsuoid.service.TranscriptBroadcastReceiver;
@@ -52,12 +60,14 @@ import me.tatocaster.ibsuoid.ui.dialog.DialogGenerator;
 /**
  * tatocaster <kutaliatato@gmail.com>
  */
-public class MainActivity extends Activity implements Drawer.OnDrawerItemClickListener{
+public class MainActivity extends Activity implements Drawer.OnDrawerItemClickListener {
 
     private static final String TAG = "MainActivity";
     private Drawer.Result materialDrawer;
     private User mUser;
     public static Activity thisActivity;
+    private List<Transcript> transcriptList = new ArrayList<Transcript>();
+    private ListView listView;
 
     private SharedPreferences prefs;
 
@@ -67,6 +77,8 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
         setContentView(R.layout.activity_main);
         // set ativity context
         thisActivity = MainActivity.this;
+
+        listView = (ListView) findViewById(R.id.transcript_list);
 
         if (!Utilities.checkNetworkAvailability(thisActivity)) {
             DialogGenerator.noNetwork(thisActivity).callback(new MaterialDialog.ButtonCallback() {
@@ -172,12 +184,88 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
     }
 
     public void fetchTranscript() {
+
+//        final ArrayList<String> str_arrayTranscript = new ArrayList<String>();
+        transcriptList.clear();
+
         VolleyClient.getInstance(this).getTranscript(
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         // https://gist.github.com/tatocaster/a5d0e7066d29aa3410cc
                         Log.d(TAG, response.toString());
+                        JSONArray jArrTranscript = null;
+                        boolean error_condition = false;
+                        try {
+                            jArrTranscript = response.getJSONObject("sis_response").getJSONArray("transcript");
+                        } catch (JSONException e) {
+                            error_condition = true;
+                        }
+                        if (error_condition) {
+                            Log.d(TAG, "Error: getting JSON Array!");
+                        } else {
+                            Log.d(TAG, String.format("Success, length is: %d", jArrTranscript.length()));
+                        }
+                        // Iterate through each item in the transcript, starting with the year name
+                        for (int yi = 0; yi < jArrTranscript.length(); yi++) {
+                            String strYearName = null;
+                            String strSemesterName = null;
+                            try {
+                                JSONObject jObjYi = jArrTranscript.getJSONObject(yi);
+                                strYearName = jObjYi.names().getString(0);
+                                JSONArray jArrSi = jObjYi.getJSONArray(strYearName);
+                                // Iterate through semesters in the year
+                                for (int si = 0; si < jArrSi.length(); si++) {
+
+                                    JSONObject jObjSi = jArrSi.getJSONObject(si);
+                                    strSemesterName = jObjSi.names().getString(0);
+                                    JSONArray jArrMi = jObjSi.getJSONArray(strSemesterName);
+
+                                    // Iterate through modules in a semester
+                                    for (int mi = 0; mi < jArrMi.length(); mi++) {
+
+                                        JSONObject jObjMi = jArrMi.getJSONObject(mi);
+                                        String strModuleName = jObjMi.names().getString(0);
+                                        // Extract the data from the module object
+                                        String strAcademicYear = jObjMi.getJSONObject(strModuleName).getString("AcademicYear");
+                                        String strSubjectName = jObjMi.getJSONObject(strModuleName).getString("SubjectName");
+                                        String strECTS = String.format("%d", jObjMi.getJSONObject(strModuleName).getInt("ECTS"));
+                                        String strHOUR = String.format("%d", jObjMi.getJSONObject(strModuleName).getInt("HOUR"));
+                                        String strMid = jObjMi.getJSONObject(strModuleName).getString("mid");
+                                        String strFinal = jObjMi.getJSONObject(strModuleName).getString("final");
+                                        String strXFinal = jObjMi.getJSONObject(strModuleName).getString("xFinal");
+                                        String strMakeup = jObjMi.getJSONObject(strModuleName).getString("makeup");
+                                        String strGrade = jObjMi.getJSONObject(strModuleName).getString("grade");
+
+                                        Transcript transcriptItem = new Transcript();
+                                        transcriptItem.setStudyYearName(strYearName);
+                                        transcriptItem.setSemesterName(strSemesterName);
+                                        transcriptItem.setModuleName(strModuleName);
+                                        transcriptItem.setAcademiccYear(strAcademicYear);
+                                        transcriptItem.setSubjectName(strSubjectName);
+                                        transcriptItem.setStudentECTS(strECTS);
+                                        transcriptItem.setLectureHours(strHOUR);
+                                        transcriptItem.setPointMid(strMid);
+                                        transcriptItem.setPointFinal(strFinal);
+                                        transcriptItem.setPointXFinal(strXFinal);
+                                        transcriptItem.setPointMakeUp(strMakeup);
+                                        transcriptItem.setStudentGrade(strGrade);
+
+                                        transcriptList.add(transcriptItem);
+                                    }
+                                }
+
+                                TranscriptListAdapter transcriptListAdapter = new TranscriptListAdapter(transcriptList, MainActivity.this);
+                                listView.setAdapter(transcriptListAdapter);
+                                transcriptListAdapter.notifyDataSetChanged();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        if (jArrTranscript.length() == 0) {
+//                            str_arrayTranscript.add("Sorry, no data is yet available!");
+                            Utilities.showToast(thisActivity, "Sorry no data is yet available.");
+                        }
                     }
                 }, null, prefs.getString("username", ""), prefs.getString("password", "") // this must change from preferences
         );

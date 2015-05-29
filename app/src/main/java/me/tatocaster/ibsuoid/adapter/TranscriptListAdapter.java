@@ -1,11 +1,17 @@
 package me.tatocaster.ibsuoid.adapter;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import me.tatocaster.ibsuoid.R;
+import me.tatocaster.ibsuoid.model.Transcript;
 
 /**
  * Created by tatocaster on 2015-05-05.
@@ -13,14 +19,22 @@ import java.util.ArrayList;
 public class TranscriptListAdapter extends BaseAdapter {
 
     ArrayList<String> entries = null;
+    private List<Transcript> transcriptList;
+    private Context context;
+    LayoutInflater inflater;
 
     @Override
     public int getCount() {
-        if(entries == null) {
+        if (entries == null) {
             return 0;
         } else {
             return entries.size();
         }
+    }
+
+    public TranscriptListAdapter(List<Transcript> transcriptList, Context context) {
+        this.context = context;
+        this.transcriptList = transcriptList;
     }
 
     @Override
@@ -35,22 +49,49 @@ public class TranscriptListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if(convertView == null) {
+
+        viewHolder viewHolder;
+
+        if (convertView == null) {
             Context context = parent.getContext();
 //            convertView = LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
+            inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.list_item, parent, false);
+            viewHolder = new viewHolder();
+            viewHolder.transcriptListItem = (TextView) convertView.findViewById(R.id.title_text);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (viewHolder) convertView.getTag();
         }
-        if(entries == null) {
-            return convertView;
+
+        Transcript transcriptItem = transcriptList.get(position);
+
+        if (transcriptItem != null) {
+
+            String strItem = "";
+
+            strItem += "Year: " + transcriptItem.getAcademiccYear() + "\n";
+            strItem += "Semester: " + transcriptItem.getSemesterName() + "\n";
+            strItem += "Module Name: " + transcriptItem.getModuleName() + "\n";
+            strItem += "Academic Year: " + transcriptItem.getAcademiccYear() + "\n";
+            strItem += "Subject Name: " + transcriptItem.getSubjectName() + "\n";
+            strItem += "ECTS: " + transcriptItem.getStudentECTS() + "\n";
+            strItem += "Hour: " + transcriptItem.getLectureHours() + "\n";
+            strItem += "Mid: " + transcriptItem.getPointMid() + "\n";
+            strItem += "Final: " + transcriptItem.getPointFinal() + "\n";
+            strItem += "Excuse final: " + transcriptItem.getPointXFinal() + "\n";
+            strItem += "Makeup: " + transcriptItem.getPointMakeUp() + "\n";
+            strItem += "Grade: " + transcriptItem.getStudentGrade();
+
+            viewHolder.transcriptListItem.setText(strItem);
+
         }
-//        TextView title_text = (TextView) convertView.findViewById(R.id.title_text);
-//        title_text.setText(entries.get(position));
 
         return convertView;
     }
 
-    public void loadData(ArrayList<String> entries) {
-        this.entries = entries;
-        notifyDataSetChanged();
+    static class viewHolder {
+        TextView transcriptListItem;
     }
 
 }
