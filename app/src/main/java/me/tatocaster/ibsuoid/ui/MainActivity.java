@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -184,12 +185,13 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
     }
 
     public void fetchTranscript() {
+
+        final ProgressDialog pd = ProgressDialog.show(this,"Please Wait...","Please Wait...");
         transcriptList.clear();
         VolleyClient.getInstance(this).getTranscript(
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        // https://gist.github.com/tatocaster/a5d0e7066d29aa3410cc
                         Log.d(TAG, response.toString());
                         JSONArray jArrTranscript = null;
 
@@ -249,6 +251,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
                                 TranscriptListAdapter transcriptListAdapter = new TranscriptListAdapter(transcriptList, MainActivity.this);
                                 listView.setAdapter(transcriptListAdapter);
                                 transcriptListAdapter.notifyDataSetChanged();
+                                pd.dismiss();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
