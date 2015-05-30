@@ -96,7 +96,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // display all preferences
-       /* Map<String, ?> keys = prefs.getAll();
+        /*Map<String, ?> keys = prefs.getAll();
         for (Map.Entry<String, ?> entry : keys.entrySet()) {
             Log.d(TAG, entry.getKey() + ": " + entry.getValue().toString());
         }*/
@@ -373,7 +373,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
     public void scheduleAlarm() {
 
         if (this.isMyServiceRunning(TranscriptFetchService.class)) {
-            Log.d("MAIN ACTIVITY", "EXISTS");
+            Log.d(TAG, "EXISTS");
             cancelAlarm();
         } else {
             String alarm = Context.ALARM_SERVICE;
@@ -384,7 +384,8 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
 
             int type = AlarmManager.ELAPSED_REALTIME_WAKEUP;
             // this will change with preference settings
-            long interval = 60 * 1000L;
+            String syncTimeFromPref = prefs.getString("sync_frequency","60");
+            long interval = Integer.valueOf(syncTimeFromPref) * 1000L;
             long firstTime = SystemClock.elapsedRealtime();
             // set alarm
             am.setInexactRepeating(type, firstTime, interval, pi);
