@@ -192,17 +192,12 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
                         // https://gist.github.com/tatocaster/a5d0e7066d29aa3410cc
                         Log.d(TAG, response.toString());
                         JSONArray jArrTranscript = null;
-                        boolean error_condition = false;
+
                         try {
                             jArrTranscript = response.getJSONObject("sis_response").getJSONArray("transcript");
                         } catch (JSONException e) {
-                            error_condition = true;
                         }
-                        if (error_condition) {
-                            Log.d(TAG, "Error: getting JSON Array!");
-                        } else {
-                            Log.d(TAG, String.format("Success, length is: %d", jArrTranscript.length()));
-                        }
+
                         // Iterate through each item in the transcript, starting with the year name
                         for (int yi = 0; yi < jArrTranscript.length(); yi++) {
                             String strYearName = null;
