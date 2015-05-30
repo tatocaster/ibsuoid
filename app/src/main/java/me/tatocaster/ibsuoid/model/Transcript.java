@@ -8,7 +8,7 @@ public class Transcript {
     private String studyYearName;
     private String semesterName;
     private String moduleName;
-    private String academiccYear;
+    private String academicYear;
     private String subjectName;
     private String studentECTS;
     private String lectureHours;
@@ -17,6 +17,10 @@ public class Transcript {
     private String pointXFinal;
     private String pointMakeUp;
     private String studentGrade;
+
+
+    public Transcript() {
+    }
 
     public String getPointMid() {
         return pointMid;
@@ -50,12 +54,12 @@ public class Transcript {
         this.moduleName = moduleName;
     }
 
-    public String getAcademiccYear() {
-        return academiccYear;
+    public String getAcademicYear() {
+        return academicYear;
     }
 
-    public void setAcademiccYear(String academiccYear) {
-        this.academiccYear = academiccYear;
+    public void setAcademicYear(String academicYear) {
+        this.academicYear = academicYear;
     }
 
     public String getSubjectName() {
@@ -114,7 +118,5 @@ public class Transcript {
         this.studentGrade = studentGrade;
     }
 
-    public Transcript() {
-    }
 
 }

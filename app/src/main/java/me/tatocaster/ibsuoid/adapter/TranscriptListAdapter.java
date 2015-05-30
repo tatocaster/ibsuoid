@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import me.tatocaster.ibsuoid.R;
@@ -18,18 +17,13 @@ import me.tatocaster.ibsuoid.model.Transcript;
  */
 public class TranscriptListAdapter extends BaseAdapter {
 
-    ArrayList<String> entries = null;
     private List<Transcript> transcriptList;
     private Context context;
     LayoutInflater inflater;
 
     @Override
     public int getCount() {
-        if (entries == null) {
-            return 0;
-        } else {
-            return entries.size();
-        }
+        return transcriptList.size();
     }
 
     public TranscriptListAdapter(List<Transcript> transcriptList, Context context) {
@@ -49,12 +43,10 @@ public class TranscriptListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
         viewHolder viewHolder;
 
         if (convertView == null) {
             Context context = parent.getContext();
-//            convertView = LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.list_item, parent, false);
             viewHolder = new viewHolder();
@@ -70,10 +62,10 @@ public class TranscriptListAdapter extends BaseAdapter {
 
             String strItem = "";
 
-            strItem += "Year: " + transcriptItem.getAcademiccYear() + "\n";
+            strItem += "Year: " + transcriptItem.getStudyYearName() + "\n";
             strItem += "Semester: " + transcriptItem.getSemesterName() + "\n";
             strItem += "Module Name: " + transcriptItem.getModuleName() + "\n";
-            strItem += "Academic Year: " + transcriptItem.getAcademiccYear() + "\n";
+            strItem += "Academic Year: " + transcriptItem.getAcademicYear() + "\n";
             strItem += "Subject Name: " + transcriptItem.getSubjectName() + "\n";
             strItem += "ECTS: " + transcriptItem.getStudentECTS() + "\n";
             strItem += "Hour: " + transcriptItem.getLectureHours() + "\n";

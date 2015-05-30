@@ -66,7 +66,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
     private Drawer.Result materialDrawer;
     private User mUser;
     public static Activity thisActivity;
-    private List<Transcript> transcriptList = new ArrayList<Transcript>();
+    private List<Transcript> transcriptList = new ArrayList<>();
     private ListView listView;
 
     private SharedPreferences prefs;
@@ -184,10 +184,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
     }
 
     public void fetchTranscript() {
-
-//        final ArrayList<String> str_arrayTranscript = new ArrayList<String>();
         transcriptList.clear();
-
         VolleyClient.getInstance(this).getTranscript(
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -241,7 +238,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
                                         transcriptItem.setStudyYearName(strYearName);
                                         transcriptItem.setSemesterName(strSemesterName);
                                         transcriptItem.setModuleName(strModuleName);
-                                        transcriptItem.setAcademiccYear(strAcademicYear);
+                                        transcriptItem.setAcademicYear(strAcademicYear);
                                         transcriptItem.setSubjectName(strSubjectName);
                                         transcriptItem.setStudentECTS(strECTS);
                                         transcriptItem.setLectureHours(strHOUR);
@@ -254,7 +251,6 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
                                         transcriptList.add(transcriptItem);
                                     }
                                 }
-
                                 TranscriptListAdapter transcriptListAdapter = new TranscriptListAdapter(transcriptList, MainActivity.this);
                                 listView.setAdapter(transcriptListAdapter);
                                 transcriptListAdapter.notifyDataSetChanged();
@@ -263,7 +259,6 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
                             }
                         }
                         if (jArrTranscript.length() == 0) {
-//                            str_arrayTranscript.add("Sorry, no data is yet available!");
                             Utilities.showToast(thisActivity, "Sorry no data is yet available.");
                         }
                     }
