@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -47,6 +46,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import me.tatocaster.ibsuoid.Constants;
 import me.tatocaster.ibsuoid.R;
 import me.tatocaster.ibsuoid.Utilities;
@@ -69,7 +69,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
     public static Activity thisActivity;
     private List<Transcript> transcriptList = new ArrayList<>();
     private ListView listView;
-
+    private TranscriptListAdapter transcriptListAdapter;
     private SharedPreferences prefs;
 
     @Override
@@ -166,6 +166,8 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
             case Constants.DRAWER_LOGOUT_ID:
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.remove("password").remove("display_name").remove("username").apply();
+                transcriptList.clear();
+                transcriptListAdapter.notifyDataSetChanged();
                 cancelAlarm();
                 materialDrawer.removeItem(position);
                 materialDrawer.addItem(
@@ -186,7 +188,9 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
 
     public void fetchTranscript() {
 
-        final ProgressDialog pd = ProgressDialog.show(this,"Please Wait...","Please Wait...");
+        final SweetAlertDialog sweetAlertDialog = DialogGenerator.sweetAlertLoading(this);
+        sweetAlertDialog.show();
+
         transcriptList.clear();
         VolleyClient.getInstance(this).getTranscript(
                 new Response.Listener<JSONObject>() {
@@ -195,70 +199,77 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
                         Log.d(TAG, response.toString());
                         JSONArray jArrTranscript = null;
 
+                        JSONObject sisResponseObject = null;
                         try {
-                            jArrTranscript = response.getJSONObject("sis_response").getJSONArray("transcript");
-                        } catch (JSONException e) {
-                        }
+                            // if authorization error occurs
+                            sisResponseObject = new JSONObject(response.getString("sis_response"));
+                            if (sisResponseObject.has("error")) {
+                                SweetAlertDialog sweetAlertError = DialogGenerator.sweetAlertError(thisActivity);
+                                sweetAlertError.show();
+                            } else {
 
-                        // Iterate through each item in the transcript, starting with the year name
-                        for (int yi = 0; yi < jArrTranscript.length(); yi++) {
-                            String strYearName = null;
-                            String strSemesterName = null;
-                            try {
-                                JSONObject jObjYi = jArrTranscript.getJSONObject(yi);
-                                strYearName = jObjYi.names().getString(0);
-                                JSONArray jArrSi = jObjYi.getJSONArray(strYearName);
-                                // Iterate through semesters in the year
-                                for (int si = 0; si < jArrSi.length(); si++) {
+                                jArrTranscript = response.getJSONObject("sis_response").getJSONArray("transcript");
 
-                                    JSONObject jObjSi = jArrSi.getJSONObject(si);
-                                    strSemesterName = jObjSi.names().getString(0);
-                                    JSONArray jArrMi = jObjSi.getJSONArray(strSemesterName);
+                                // Iterate through each item in the transcript, starting with the year name
+                                for (int yi = 0; yi < jArrTranscript.length(); yi++) {
+                                    String strYearName = null;
+                                    String strSemesterName = null;
+                                    try {
+                                        JSONObject jObjYi = jArrTranscript.getJSONObject(yi);
+                                        strYearName = jObjYi.names().getString(0);
+                                        JSONArray jArrSi = jObjYi.getJSONArray(strYearName);
+                                        // Iterate through semesters in the year
+                                        for (int si = 0; si < jArrSi.length(); si++) {
 
-                                    // Iterate through modules in a semester
-                                    for (int mi = 0; mi < jArrMi.length(); mi++) {
+                                            JSONObject jObjSi = jArrSi.getJSONObject(si);
+                                            strSemesterName = jObjSi.names().getString(0);
+                                            JSONArray jArrMi = jObjSi.getJSONArray(strSemesterName);
 
-                                        JSONObject jObjMi = jArrMi.getJSONObject(mi);
-                                        String strModuleName = jObjMi.names().getString(0);
-                                        // Extract the data from the module object
-                                        String strAcademicYear = jObjMi.getJSONObject(strModuleName).getString("AcademicYear");
-                                        String strSubjectName = jObjMi.getJSONObject(strModuleName).getString("SubjectName");
-                                        String strECTS = String.format("%d", jObjMi.getJSONObject(strModuleName).getInt("ECTS"));
-                                        String strHOUR = String.format("%d", jObjMi.getJSONObject(strModuleName).getInt("HOUR"));
-                                        String strMid = jObjMi.getJSONObject(strModuleName).getString("mid");
-                                        String strFinal = jObjMi.getJSONObject(strModuleName).getString("final");
-                                        String strXFinal = jObjMi.getJSONObject(strModuleName).getString("xFinal");
-                                        String strMakeup = jObjMi.getJSONObject(strModuleName).getString("makeup");
-                                        String strGrade = jObjMi.getJSONObject(strModuleName).getString("grade");
+                                            // Iterate through modules in a semester
+                                            for (int mi = 0; mi < jArrMi.length(); mi++) {
 
-                                        Transcript transcriptItem = new Transcript();
-                                        transcriptItem.setStudyYearName(strYearName);
-                                        transcriptItem.setSemesterName(strSemesterName);
-                                        transcriptItem.setModuleName(strModuleName);
-                                        transcriptItem.setAcademicYear(strAcademicYear);
-                                        transcriptItem.setSubjectName(strSubjectName);
-                                        transcriptItem.setStudentECTS(strECTS);
-                                        transcriptItem.setLectureHours(strHOUR);
-                                        transcriptItem.setPointMid(strMid);
-                                        transcriptItem.setPointFinal(strFinal);
-                                        transcriptItem.setPointXFinal(strXFinal);
-                                        transcriptItem.setPointMakeUp(strMakeup);
-                                        transcriptItem.setStudentGrade(strGrade);
+                                                JSONObject jObjMi = jArrMi.getJSONObject(mi);
+                                                String strModuleName = jObjMi.names().getString(0);
+                                                // Extract the data from the module object
+                                                String strAcademicYear = jObjMi.getJSONObject(strModuleName).getString("AcademicYear");
+                                                String strSubjectName = jObjMi.getJSONObject(strModuleName).getString("SubjectName");
+                                                String strECTS = String.format("%d", jObjMi.getJSONObject(strModuleName).getInt("ECTS"));
+                                                String strHOUR = String.format("%d", jObjMi.getJSONObject(strModuleName).getInt("HOUR"));
+                                                String strMid = jObjMi.getJSONObject(strModuleName).getString("mid");
+                                                String strFinal = jObjMi.getJSONObject(strModuleName).getString("final");
+                                                String strXFinal = jObjMi.getJSONObject(strModuleName).getString("xFinal");
+                                                String strMakeup = jObjMi.getJSONObject(strModuleName).getString("makeup");
+                                                String strGrade = jObjMi.getJSONObject(strModuleName).getString("grade");
 
-                                        transcriptList.add(transcriptItem);
+                                                Transcript transcriptItem = new Transcript();
+                                                transcriptItem.setStudyYearName(strYearName);
+                                                transcriptItem.setSemesterName(strSemesterName);
+                                                transcriptItem.setModuleName(strModuleName);
+                                                transcriptItem.setAcademicYear(strAcademicYear);
+                                                transcriptItem.setSubjectName(strSubjectName);
+                                                transcriptItem.setStudentECTS(strECTS);
+                                                transcriptItem.setLectureHours(strHOUR);
+                                                transcriptItem.setPointMid(strMid);
+                                                transcriptItem.setPointFinal(strFinal);
+                                                transcriptItem.setPointXFinal(strXFinal);
+                                                transcriptItem.setPointMakeUp(strMakeup);
+                                                transcriptItem.setStudentGrade(strGrade);
+
+                                                transcriptList.add(transcriptItem);
+                                            }
+                                        }
+                                        transcriptListAdapter = new TranscriptListAdapter(transcriptList, MainActivity.this);
+                                        listView.setAdapter(transcriptListAdapter);
+                                        transcriptListAdapter.notifyDataSetChanged();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
                                     }
                                 }
-                                TranscriptListAdapter transcriptListAdapter = new TranscriptListAdapter(transcriptList, MainActivity.this);
-                                listView.setAdapter(transcriptListAdapter);
-                                transcriptListAdapter.notifyDataSetChanged();
-                                pd.dismiss();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
-                        }
-                        if (jArrTranscript.length() == 0) {
+                        } catch (JSONException e) {
                             Utilities.showToast(thisActivity, "Sorry no data is yet available.");
                         }
+                        sweetAlertDialog.dismiss();
                     }
                 }, null, prefs.getString("username", ""), prefs.getString("password", "") // this must change from preferences
         );
@@ -382,7 +393,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
 
             int type = AlarmManager.ELAPSED_REALTIME_WAKEUP;
             // this will change with preference settings
-            String syncTimeFromPref = prefs.getString("sync_frequency","60");
+            String syncTimeFromPref = prefs.getString("sync_frequency", "60");
             long interval = Integer.valueOf(syncTimeFromPref) * 1000L;
             long firstTime = SystemClock.elapsedRealtime();
             // set alarm
