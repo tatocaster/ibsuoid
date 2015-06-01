@@ -97,10 +97,10 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // display all preferences
-        /*Map<String, ?> keys = prefs.getAll();
-        for (Map.Entry<String, ?> entry : keys.entrySet()) {
-            Log.d(TAG, entry.getKey() + ": " + entry.getValue().toString());
-        }*/
+//        Map<String, ?> keys = prefs.getAll();
+//        for (Map.Entry<String, ?> entry : keys.entrySet()) {
+//            Log.d(TAG, entry.getKey() + ": " + entry.getValue().toString());
+//        }
 
         if (prefs.getString("password", "").isEmpty() || prefs.getString("username", "").isEmpty()) {
             showLoginDialog();
@@ -394,7 +394,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
             int type = AlarmManager.ELAPSED_REALTIME_WAKEUP;
             // this will change with preference settings
             String syncTimeFromPref = prefs.getString("sync_frequency", "60");
-            long interval = Integer.valueOf(syncTimeFromPref) * 1000L;
+            long interval = 60 * 1000L;
             long firstTime = SystemClock.elapsedRealtime();
             // set alarm
             am.setInexactRepeating(type, firstTime, interval, pi);
