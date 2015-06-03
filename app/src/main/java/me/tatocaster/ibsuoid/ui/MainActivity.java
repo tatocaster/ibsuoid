@@ -106,6 +106,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
             showLoginDialog();
         } else {
             fetchTranscript();
+            scheduleAlarm();
         }
 
         mUser = new User();
@@ -394,7 +395,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
             int type = AlarmManager.ELAPSED_REALTIME_WAKEUP;
             // this will change with preference settings
             String syncTimeFromPref = prefs.getString("sync_frequency", "60");
-            long interval = 60 * 1000L;
+            long interval = Integer.valueOf(syncTimeFromPref) * 1000L;
             long firstTime = SystemClock.elapsedRealtime();
             // set alarm
             am.setInexactRepeating(type, firstTime, interval, pi);

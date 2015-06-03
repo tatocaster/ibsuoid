@@ -22,9 +22,9 @@ public class Splash extends Activity {
      */
 
     @Override
-    public void onCreate(Bundle icicle) {
+    public void onCreate(Bundle bundle) {
 
-        super.onCreate(icicle);
+        super.onCreate(bundle);
         setContentView(R.layout.activity_splash);
 
         /** New Handler to start the Menu-Activity
