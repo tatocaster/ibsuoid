@@ -1,4 +1,4 @@
-![ibsuoid](https://raw.githubusercontent.com/tatocaster/ibsuoid/master/app/src/main/res/mipmap-xhdpi/ic_launcher.png)
+![ibsuoid](https://raw.githubusercontent.com/tatocaster/ibsuoid/master/app/src/main/res/mipmap-xhdpi/ic_launcher_icon.png)
 # ibsuoid
 IBSU android course project to view transcript and get new information from different services
 
